@@ -1,4 +1,6 @@
 import contextlib
+from typing import Optional
+
 
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
@@ -12,7 +14,7 @@ from src.conf.config import config
 
 class DatabaseSessionManager:
     def __init__(self, url: str):
-        self._engine: AsyncEngine | None = create_async_engine(url)
+        self._engine: Optional[AsyncEngine] = create_async_engine(url)
         self._session_maker: async_sessionmaker = async_sessionmaker(
             autoflush=False, autocommit=False, bind=self._engine
         )
@@ -25,8 +27,9 @@ class DatabaseSessionManager:
         try:
             yield session
         except SQLAlchemyError as e:
+            print(f"SQLAlchemy error: {e}")
             await session.rollback()
-            raise  # Re-raise the original error
+            raise
         finally:
             await session.close()
 

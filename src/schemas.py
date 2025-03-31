@@ -11,15 +11,6 @@ class ContactBase(BaseModel):
     birth_date: Optional[datetime] = None
     additional_info: Optional[str] = Field(max_length=255, default=None)
 
-
-class ContactCreate(ContactBase):
-    pass
-
-
-class ContactUpdate(ContactBase):
-    pass
-
-
 class ContactResponse(ContactBase):
     id: int
     created_at: datetime
