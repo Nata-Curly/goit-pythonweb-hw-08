@@ -70,3 +70,21 @@ class ContactRepository:
 
         contacts = await self.db.execute(stmt)
         return contacts.scalars().all()
+    
+
+    async def search_contacts(self, first_name: Optional[str], last_name: Optional[str], email: Optional[str]) -> List[Contact]:
+        stmt = select(Contact)
+
+        filters = []
+        if first_name:
+            filters.append(Contact.first_name.ilike(f"%{first_name}%"))
+        if last_name:
+            filters.append(Contact.last_name.ilike(f"%{last_name}%"))
+        if email:
+            filters.append(Contact.email.ilike(f"%{email}%"))
+
+        if filters:
+            stmt = stmt.where(or_(*filters))
+
+        result = await self.db.execute(stmt)
+        return result.scalars().all()

@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from typing import Optional
 from src.repository.contacts import ContactRepository
 from src.schemas import ContactBase
 
@@ -25,3 +25,6 @@ class ContactService:
 
     async def get_birthdays(self):
         return await self.repository.get_birthdays()
+    
+    async def search_contacts(self, first_name: Optional[str], last_name: Optional[str], email: Optional[str]):
+        return await self.repository.search_contacts(first_name, last_name, email)

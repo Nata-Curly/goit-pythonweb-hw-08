@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.db import get_db
@@ -68,3 +68,19 @@ async def remove_contact(contact_id: int, db: AsyncSession = Depends(get_db)):
             status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found"
         )
     return contact
+
+
+@router.get("/contacts/search", response_model=List[ContactResponse])
+async def search_contacts(
+    first_name: Optional[str] = Query(None, min_length=1),
+    last_name: Optional[str] = Query(None, min_length=1),
+    email: Optional[str] = Query(None, min_length=3),
+    db: AsyncSession = Depends(get_db),
+):
+    contact_service = ContactService(db)
+    contacts = await contact_service.search_contacts(first_name, last_name, email)
+    if not contacts:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Contacts not found"
+        )
+    return contacts
